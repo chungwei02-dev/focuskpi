@@ -108,6 +108,7 @@ thead th {
   font-weight: 600; font-size: 12px; white-space: nowrap; line-height: 1.4;
 }
 thead th:nth-child(-n+3) { text-align: left; }
+thead th.sortable:nth-child(-n+3) { text-align: left; }
 thead th.sortable { cursor: pointer; user-select: none; }
 thead th.sortable:hover { background: #154360; }
 thead th .sort-icon { margin-left: 3px; font-size: 10px; opacity: 0.5; }
@@ -540,7 +541,7 @@ function setSort(key) {
 // ─── Table ────────────────────────────────────────────────────────
 function renderTableHead826() {
   return `<tr>
-    <th>區課</th><th>區顧問</th><th>門市</th>
+    <th class="sortable" data-skey="district" onclick="setSort('district')">區課<span class="sort-icon"></span></th><th class="sortable" data-skey="ofc" onclick="setSort('ofc')">區顧問<span class="sort-icon"></span></th><th class="sortable" data-skey="store" onclick="setSort('store')">門市<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="star" onclick="setSort('star')">星級饗宴<br>晶英聯名<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="matcha" onclick="setSort('matcha')">和風抹茶<br>紅豆季<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="tea" onclick="setSort('tea')">茶裏王<br>綠茶玉露<span class="sort-icon"></span></th>
@@ -552,7 +553,7 @@ function renderTableHead826() {
 }
 function renderTableHead827() {
   return `<tr>
-    <th>區課</th><th>區顧問</th><th>門市</th>
+    <th class="sortable" data-skey="district" onclick="setSort('district')">區課<span class="sort-icon"></span></th><th class="sortable" data-skey="ofc" onclick="setSort('ofc')">區顧問<span class="sort-icon"></span></th><th class="sortable" data-skey="store" onclick="setSort('store')">門市<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="star" onclick="setSort('star')">星級饗宴<br>晶華菁華<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="food" onclick="setSort('food')">世界四大<br>美食認證<span class="sort-icon"></span></th>
     <th class="sortable" data-skey="fin" onclick="setSort('fin')">黑松FIN<br>補給飲料<span class="sort-icon"></span></th>
@@ -565,7 +566,7 @@ function renderTableHead827() {
 }
 function renderTableHeadBoth() {
   return `<tr>
-    <th rowspan="2">區課</th><th rowspan="2">區顧問</th><th rowspan="2">門市</th>
+    <th rowspan="2" class="sortable" data-skey="district" onclick="setSort('district')">區課<span class="sort-icon"></span></th><th rowspan="2" class="sortable" data-skey="ofc" onclick="setSort('ofc')">區顧問<span class="sort-icon"></span></th><th rowspan="2" class="sortable" data-skey="store" onclick="setSort('store')">門市<span class="sort-icon"></span></th>
     <th colspan="2" class="th-826">826 檔期<br><span style="font-weight:400;font-size:11px">3/18–3/31</span></th>
     <td class="th-sep" rowspan="2"></td>
     <th colspan="2" class="th-827">827 檔期<br><span style="font-weight:400;font-size:11px">4/1–4/14</span></th>
@@ -689,7 +690,14 @@ function renderTableBoth() {
   ])];
   
   // Sort
+  const STR_KEYS_BOTH = ['district','ofc','store'];
   const sorted = [...allKeys].sort((a,b) => {
+    if (STR_KEYS_BOTH.includes(sortKey)) {
+      const ap = a.split('||'); const bp = b.split('||');
+      const av = sortKey==='store' ? ap[0] : sortKey==='ofc' ? (ofcMap[a]||ap[1]||'') : (distMap[a]||'');
+      const bv = sortKey==='store' ? bp[0] : sortKey==='ofc' ? (ofcMap[b]||bp[1]||'') : (distMap[b]||'');
+      return sortDir==='desc' ? bv.localeCompare(av,'zh') : av.localeCompare(bv,'zh');
+    }
     const va = sortKey==='total826' ? mapTotal826[a]||0 :
                sortKey==='total827' ? mapTotal827[a]||0 : (mapTotal827[a]||0)-(mapTotal826[a]||0);
     const vb = sortKey==='total826' ? mapTotal826[b]||0 :
